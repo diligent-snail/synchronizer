@@ -1,0 +1,95 @@
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+= Synchronizer
+
+== Задача
+
+Изменить класс link:src/main/java/org/diligentsnail/synchronizer/Synchronizer.java[`Synchronizer`], так чтобы программа выводила числа в порядке:
+
+[source,text]
+----
+1
+2
+3
+----
+
+Условие: нельзя менять ничего, кроме класса link:src/main/java/org/diligentsnail/synchronizer/Synchronizer.java[`Synchronizer`]
+
+== Что использовать
+
+Можно:
+
+. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html[`ReentrantLock`]
+. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html[`ReentrantLock`] и https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/Condition.html[`Condition`]
+. `volatile`
+. Всё, что известно
+
+[TIP]
+====
+У задачи несколько решений, принято будет любое корректное
+====
+
+== О `ReentrantLock`
+
+https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html[`ReentrantLock`] -- аналог встроенного механизма блокировок в Java.
+
+Такой код:
+
+[source,java]
+----
+public class LockDemo {
+    private final Object lock = new Object();
+
+    public void run() {
+        synchronized (lock) {
+            // somethingElse
+        }
+    }
+}
+----
+
+можно поменять на:
+
+[source,java]
+----
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class LockDemo {
+    private final Lock lock = new ReentrantLock();
+
+    public void run() {
+        lock.lock(); // <1>
+        try {
+            // somethingElse // <2>
+        } finally {
+            lock.unlock(); // <3>
+        }
+    }
+}
+----
+
+<1> Захватить блокировку
+<2> Выполнить действие под блокировкой
+<3> Отпустить блокировку
+
+== Как проверить
+
+Попробуйте запустить:
+
+. метод `main` класса link:src/main/java/org/diligentsnail/synchronizer/Main.java[`Main`]
+. тест link:src/test/java/org/diligentsnail/synchronizer/SynchronizerTest.java[`SynchronizerTest`]
+
+== Как открыть проект
+
+. Скачать проект или `git clone`
+. В Intellij IDEA:
+.. File
+.. New Project from Existing Sources
+.. Выбрать `pom.xml` проекта
